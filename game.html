@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Qual o jogo?</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/halfmoon@1.1.1/css/halfmoon-variables.min.css" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/halfmoon@1.1.1/js/halfmoon.min.js"></script>
+
+    <!-- <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> -->
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css" />
+    <script src="https://code.jquery.com/jquery-1.9.1.js"></script>
+    <script src="https://code.jquery.com/ui/1.10.3/jquery-ui.js"></script>
+
+    <script src="https://kit.fontawesome.com/7854e7e538.js" crossorigin="anonymous"></script>
+
+    <style>
+        h1, p{
+            text-align: center;
+        }
+    </style>
+
+    <script src="app.js"></script>
+    <script src="tmi.min.js"></script>
+
+    <script>
+        var games = ["God of War", "Ratchet & Clank"]
+    </script>
+
+    <script>
+
+        const client = new tmi.Client({
+            channels: [ getUrlParameter("t") ]
+        });
+
+        client.connect();
+
+
+    </script>
+
+    <style>
+
+        .zoom:hover {
+            -ms-transform: scale(2); /* IE 9 */
+            -webkit-transform: scale(2); /* Safari 3-8 */
+            transform: scale(2); 
+        }
+
+        .stats{
+            text-align: center;
+        }
+
+        input{
+            padding: 5px;
+            border-radius: 5px;
+        }
+    </style>
+ 
+</head>
+<body class="dark-mode">
+
+    <script>
+
+
+        var total_games = games.length
+        var img = 0
+        var acertos = 0
+
+        function checar(){
+            if($("#guess").val() == games[img]){
+                acertos++
+            }
+            $("#guess").val("")
+        }
+
+        function next_img(){
+
+            checar()
+
+            if(img + 1 >= total_games){
+                $("#chat-guess").hide()
+                $("#guess").hide()
+
+                $("#acertos").html("Você acertou: " + acertos)
+                $("#acertos").show()
+                $("#img").remove()
+                $("#restart").show()
+                $("#next_img").hide()
+                $("#chat-guess").html("O chat acertou: " + acertos_chat)
+            }else{
+                img++
+                $("#chat-guess").html("")
+                $("#chat-guess").hide()
+                $("#img").attr("src", "img/" + games[img] + ".jpg");
+            }
+        }
+
+
+        shuffle(games)
+
+    </script>
+
+    <h1>Qual é o jogo?</h1>
+
+    <div class="container">
+        <p class="stats" id="chat-guess" style="display: none;"></p>
+        <h4 class="stats" id="acertos" style="display: none;"></h4>
+
+        <div class="card text-center">
+            <img class="img-fluid zoom" id="img" alt="" width="50%">
+
+            <br>
+
+            <input id="guess"  type="text" class="form-control text-center">            
+            
+            <br>
+
+            <div style="margin-top: 15px">
+                <button class="btn btn-primary" id="next_img" type="button" onclick="next_img()">Próxima imagem</button>
+                <button class="btn btn-primary" id="restart" style="display: none;" type="button" onclick="window.location.reload()">Reiniciar</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        $("#img").attr("src", "img/" + games[img] + ".jpg");
+
+
+        client.on('message', (channel, tags, message, self) => {
+            // console.log(`${tags['display-name']}: ${message}`);
+
+            if(message.toLowerCase() == games[img].toLowerCase()){
+                $("#chat-guess").html(`<span style="font-weight: bolder; color: ${tags['color']}"/>${tags['display-name']}</span> Acertou <br>`)
+                $("#chat-guess").show()
+            }
+        });
+
+        $("#guess").autocomplete({
+            source: games, 
+            minLength: 2,
+        });
+    </script>
+</body>
+</html>

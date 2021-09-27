@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Qual o jogo?</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/halfmoon@1.1.1/css/halfmoon-variables.min.css" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/halfmoon@1.1.1/js/halfmoon.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://kit.fontawesome.com/7854e7e538.js" crossorigin="anonymous"></script>
+
+
+ 
+</head>
+<body class="dark-mode">
+    <div class="container">
+        <div class="card">
+            <h2 class="card-title">
+                Integração com o chat da Twitch
+            </h2>
+            <p>
+                Caso queira deixar o chat tentar acertar a resposta, coloque o seu nome da twitch no campo a baixo, caso não queira, deixe em branco. <br>
+                Mesmo com a integração ativada, a resposta não vai aparecer na tela caso alguem do chat acerte, apenas mostrará o nome da pessoa. <br>
+                Para o chat a resposta não é case-sensitive, "Melhor Jogo do Mundo" == "melhor jogo do mundo"
+            </p>
+
+            <form action="game.html" method="get" class="form-inline">
+                <label class="" for="twitch-user">Twitch User: </label>
+                <input type="text" class="form-control" name="t" placeholder="JeFFF" id="twitch-user">
+                <input type="submit" class="btn btn-primary" value="Continuar">
+            </form>
+        </div>
+    </div>
+</body>
+</html>
