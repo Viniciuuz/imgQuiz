@@ -54,28 +54,6 @@
             text-align: center;
             margin-top: 10px;
         }
-    </style>
-
-    <script src="app.js"></script>
-    <script src="tmi.min.js"></script>
-
-    <script>
-        // var games = ["God of War", "Ratchet & Clank"]
-        var games = ["Cyberpunk 2077", "Uncharted 3"]
-    </script>
-
-    <script>
-
-        const client = new tmi.Client({
-            channels: [ getUrlParameter("t") ]
-        });
-
-        client.connect();
-
-
-    </script>
-
-    <style>
 
         .zoom:hover {
             -ms-transform: scale(2); /* IE 9 */
@@ -92,6 +70,37 @@
             border-radius: 5px;
         }
     </style>
+
+    <script src="app.js"></script>
+    <script src="tmi.min.js"></script>
+
+    <script src="games.js"></script>
+
+    <script>
+         // var games = ["Cyberpunk 2077", "Uncharted 3"]
+
+         function rankear( a, b ) {
+            if ( a.acertos > b.acertos ){
+                return -1;
+            }
+            if ( a.acertos < b.acertos ){
+                return 1;
+            }
+            return 0;
+        }
+
+        const client = new tmi.Client({
+            channels: [ getUrlParameter("t") ]
+        });
+
+        client.connect();
+
+
+    </script>
+
+    <style>
+
+    </style>
  
 </head>
 <body class="dark-mode">
@@ -103,6 +112,10 @@
         var img = 0
         var guesses = []
         var acertos = 0
+
+        var chat = []
+        var ranking = []
+        var acertos_chat = []
 
         function checar(){
             guesses.push($("#guess").val())
@@ -136,15 +149,37 @@
 
                 $("#acertos").html("Você acertou: " + acertos)
                 $("#acertos").show()
+
                 $("#card").remove()
+
                 $("#restart").show()
+
                 $("#next_img").hide()
 
                 respostas()
+
+                $.each(chat, function(index, item){
+                    var data = {
+                        "user": item.user,
+                        "acertos": acertos_chat[item.user],
+                        "color": item.color
+                    }
+
+                    ranking.push(data)
+                })
+
+                $.each(ranking.sort(rankear), function(indx, item){
+                    $("#chat_rank_ul").append(`<li><span style="color: ${item.color};">${item.user}</span>: ${item.acertos}`)
+                })
+
+                $("#rank_modal").show()
+
+                
             }else{
                 img++
                 $("#chat-guess").html("")
                 $("#chat-guess").hide()
+
                 $("#img").attr("src", "img/" + games[img] + ".jpg");
             }
         }
@@ -155,8 +190,13 @@
     </script>
 
     <h1>Qual é o jogo?</h1>
+    <h3 style="text-align: center;">Total de áudios: <span id="TotalAudios"></span></h3>
     <p class="stats" id="chat-guess" style="display: none;"></p>
     <h4 class="stats" id="acertos" style="display: none;"></h4>
+
+    <div style="text-align: center;">
+        <a href="#chat_rank" style="display: none;" id="rank_modal" class="btn btn-primary" role="button">Ranking do chat</a>
+    </div>
 
     <div class="container" id="main-container">
 
@@ -190,16 +230,48 @@
             // console.log(`${tags['display-name']}: ${message}`);
 
             if(message.toLowerCase() == games[img].toLowerCase()){
-                $("#chat-guess").html(`<span style="font-weight: bolder; color: ${tags['color']}"/>${tags['display-name']}</span> Acertou <br>`)
+                $("#chat-guess").html(`<span style="font-weight: bolder; color: ${tags['color']}">${tags['display-name']}</span> Acertou`)
                 $("#chat-guess").show()
+
+                if(!(tags['display-name'] in acertos_chat)){
+                    acertos_chat[tags['display-name']] = 1
+                    var data = {
+                        "user": tags['display-name'],
+                        "color": tags['color']
+                    }
+                    chat.push(data)
+                }else{
+                    acertos_chat[tags['display-name']] += 1
+                }
             }
         });
 
         $("#guess").autocomplete({
             source: games, 
-            minLength: 2,
+            minLength: 3,
         });
+
+        $("#TotalAudios").html(games.length)
+
     </script>
+
+    <div class="modal" id="chat_rank" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <a href="#" class="close" role="button" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+            </a>
+            <h5 class="modal-title">Ranking Do Chat:</h5>
+            <p>
+            <ol id="chat_rank_ul">
+            </ol>
+            </p>
+            <div class="text-right mt-20">
+            <a href="#" class="btn mr-5" role="button">Fechar (Esc)</a>
+            </div>
+        </div>
+        </div>
+    </div>
 
     <footer>
         Criado Por: <a href="https://github.com/Viniciuuz" target="_blank" rel="noopener noreferrer">Viniciuuz</a>
