@@ -107,6 +107,9 @@
 
     <script>
 
+        var valendo = true
+        var timer = getUrlParameter("timer")
+
 
         var total_games = games.length
         var img = 0
@@ -117,13 +120,13 @@
         var ranking = []
         var acertos_chat = []
 
-        function checar(){
-            guesses.push($("#guess").val())
-            if($("#guess").val() == games[img]){
-                acertos++
-            }
-            $("#guess").val("")
-        }
+        // function checar(){
+        //     guesses.push($("#guess").val())
+        //     if($("#guess").val() == games[img]){
+        //         acertos++
+        //     }
+        //     $("#guess").val("")
+        // }
 
         function respostas(){
             $.each(games, function(index, item) {
@@ -141,9 +144,16 @@
 
         function next_img(){
 
-            checar()
+            guesses.push($("#guess").val())
+            if($("#guess").val() == games[img]){
+                acertos++
+            }
+            $("#guess").val("")
+            timer = getUrlParameter("timer")
+            countdown()
 
             if(img + 1 >= total_games){
+                valendo = false
                 $("#chat-guess").hide()
                 $("#guess").hide()
 
@@ -151,6 +161,7 @@
                 $("#acertos").show()
 
                 $("#card").remove()
+                $("#countdown").remove()
 
                 $("#restart").show()
 
@@ -181,6 +192,7 @@
                 $("#chat-guess").hide()
 
                 $("#img").attr("src", "img/" + games[img] + ".jpg");
+
             }
         }
 
@@ -191,6 +203,7 @@
 
     <h1>Qual é o jogo?</h1>
     <h3 style="text-align: center;">Total de áudios: <span id="TotalAudios"></span></h3>
+    <h4 style="text-align: center;" id="countdown">Timer: <span id="timer"></span></h4>
     <p class="stats" id="chat-guess" style="display: none;"></p>
     <h4 class="stats" id="acertos" style="display: none;"></h4>
 
@@ -253,6 +266,25 @@
 
         $("#TotalAudios").html(games.length)
 
+        function countdown(){
+            if(valendo){
+                $("#timer").text(timer)
+                if(timer > 0){
+                    timer -= 1
+                    $("#timer").text(timer)
+                    setTimeout(countdown, 1000)
+                }else if(timer == 0){
+                    console.log(timer)
+                    document.getElementById("next_img").click()
+                    timer = getUrlParameter("timer")
+                    $("#timer").text(timer)
+                    
+                    // console.log("tempo acabou")
+                }
+            }
+        }
+
+        countdown()
     </script>
 
     <div class="modal" id="chat_rank" tabindex="-1" role="dialog">
